@@ -66,6 +66,17 @@
   }
   @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
 
+  .avatar-wrap{
+    width:84px; height:84px; border-radius:50%;
+    padding:3px; margin-bottom:24px;
+    background:conic-gradient(from 180deg, var(--signal), var(--robot), var(--signal));
+    display:inline-flex;
+  }
+  .avatar-wrap img{
+    width:100%; height:100%; border-radius:50%; object-fit:cover;
+    display:block; border:3px solid var(--bg);
+  }
+
   .eyebrow{
     font-family:'IBM Plex Mono'; font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
     color:var(--signal); display:flex; align-items:center; gap:10px; margin-bottom:20px;
@@ -234,6 +245,7 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div>
+      <div class="avatar-wrap"><img src="profile.png" alt="Md. Shazib Sheikh"></div>
       <div class="eyebrow">Autonomous Systems Engineer</div>
       <h1>Robots don't run<br>in <span class="accent">isolation.</span><br>Neither do I.</h1>
       <p class="lede">M.Sc. candidate in Robotics &amp; Autonomous Systems, moving from a foundation of two years keeping nationwide telecom networks alive — now building perception and decision-making into machines that need to coordinate, not just compute.</p>
