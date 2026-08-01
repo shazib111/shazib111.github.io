@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Md. Shazib Sheikh — Autonomous Systems Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1210;
+    --surface:#161D1A;
+    --surface-2:#1D2622;
+    --line:#2A3530;
+    --ink:#E8EDE9;
+    --muted:#8CA39A;
+    --dim:#5C6E67;
+    --signal:#3ED6B5;   /* fiber / data / network */
+    --robot:#FF7A3D;    /* industrial safety orange */
+    --signal-dim: rgba(62,214,181,0.15);
+    --robot-dim: rgba(255,122,61,0.15);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--signal); color:#0D1210; }
+
+  h1,h2,h3{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em; }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+
+  a{ color:inherit; text-decoration:none; }
+
+  .wrap{ max-width:1120px; margin:0 auto; padding:0 32px; }
+
+  /* ---------- Nav ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    backdrop-filter: blur(10px);
+    background:rgba(13,18,16,0.75);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; padding:16px 32px; }
+  .brand{ font-family:'Space Grotesk'; font-weight:700; font-size:16px; display:flex; align-items:center; gap:8px;}
+  .brand .dot{ width:8px; height:8px; border-radius:50%; background:var(--signal); box-shadow:0 0 8px var(--signal); animation:pulse-dot 2s infinite; }
+  @keyframes pulse-dot{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .navlinks{ display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  .navlinks a:hover{ color:var(--signal); }
+  @media (max-width:700px){ .navlinks{ display:none; } }
+
+  /* ---------- Hero ---------- */
+  header.hero{
+    min-height:100svh;
+    display:flex; align-items:center;
+    padding-top:80px;
+    position:relative;
+  }
+  .hero-grid{
+    display:grid; grid-template-columns: 1.1fr 0.9fr; gap:48px; align-items:center; width:100%;
+  }
+  @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono'; font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--signal); display:flex; align-items:center; gap:10px; margin-bottom:20px;
+  }
+  .eyebrow::before{ content:''; width:24px; height:1px; background:var(--signal); }
+
+  .hero h1{
+    font-size:clamp(34px, 5.2vw, 58px);
+    font-weight:700; line-height:1.05; margin-bottom:20px;
+  }
+  .hero h1 .accent{ color:var(--signal); }
+  .hero p.lede{
+    color:var(--muted); font-size:17px; max-width:520px; margin-bottom:32px;
+  }
+  .hero-meta{ display:flex; flex-wrap:wrap; gap:14px 28px; margin-bottom:36px; }
+  .hero-meta div{ font-size:13px; color:var(--dim); }
+  .hero-meta div span{ display:block; font-family:'IBM Plex Mono'; color:var(--ink); font-size:14px; margin-top:2px; }
+
+  .btn-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:13px 22px; border-radius:3px; font-size:14px; font-weight:600;
+    border:1px solid var(--line); transition:all .2s ease;
+  }
+  .btn-primary{ background:var(--signal); color:#0A1210; border-color:var(--signal); }
+  .btn-primary:hover{ background:#5eeed0; }
+  .btn-ghost:hover{ border-color:var(--signal); color:var(--signal); }
+
+  /* ---------- Signature: network/robot node graph ---------- */
+  .panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:6px;
+    padding:20px; position:relative; overflow:hidden;
+  }
+  .panel-head{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono'; font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:0.08em;
+    margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--line);
+  }
+  .panel-head .live{ color:var(--signal); display:flex; align-items:center; gap:6px;}
+  .panel-head .live::before{ content:''; width:6px; height:6px; border-radius:50%; background:var(--signal); animation:pulse-dot 1.6s infinite; }
+
+  svg#netgraph{ width:100%; height:auto; display:block; }
+  .node-core{ fill:var(--surface-2); stroke:var(--signal); stroke-width:1.4; }
+  .node-robot{ fill:var(--surface-2); stroke:var(--robot); stroke-width:1.4; }
+  .edge{ stroke:var(--line); stroke-width:1.2; fill:none; }
+  .pulse{ fill:var(--signal); filter:drop-shadow(0 0 4px var(--signal)); }
+  .pulse.o{ fill:var(--robot); filter:drop-shadow(0 0 4px var(--robot)); }
+  .label-sm{ font-family:'IBM Plex Mono'; font-size:8px; fill:var(--dim); }
+
+  .stat-row{ display:flex; justify-content:space-between; margin-top:14px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--dim); }
+  .stat-row b{ color:var(--ink); display:block; font-size:15px; margin-top:2px; }
+
+  /* ---------- Section shared ---------- */
+  section{ padding:110px 0; border-top:1px solid var(--line); }
+  .section-head{ display:flex; align-items:baseline; gap:16px; margin-bottom:48px; }
+  .section-head .idx{ font-family:'IBM Plex Mono'; color:var(--dim); font-size:13px; }
+  .section-head h2{ font-size:clamp(24px,3vw,34px); }
+  .section-sub{ color:var(--muted); max-width:600px; margin-top:-32px; margin-bottom:48px; font-size:15px; }
+
+  /* ---------- About ---------- */
+  .about-grid{ display:grid; grid-template-columns: 1.4fr 1fr; gap:56px; }
+  @media (max-width:800px){ .about-grid{ grid-template-columns:1fr; } }
+  .about-grid p{ color:var(--muted); margin-bottom:18px; font-size:16px; }
+  .about-grid strong{ color:var(--ink); font-weight:600; }
+  .signal-word{ color:var(--signal); }
+  .robot-word{ color:var(--robot); }
+
+  .fact-list{ display:flex; flex-direction:column; gap:0; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .fact{ padding:16px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; font-size:13px; }
+  .fact:last-child{ border-bottom:none; }
+  .fact .k{ color:var(--dim); font-family:'IBM Plex Mono'; }
+  .fact .v{ color:var(--ink); text-align:right; font-weight:500; }
+
+  /* ---------- Timeline (Education roadmap) ---------- */
+  .roadmap{ position:relative; padding-left:32px; }
+  .roadmap::before{ content:''; position:absolute; left:5px; top:6px; bottom:6px; width:1px; background:linear-gradient(var(--signal), var(--robot)); }
+  .rm-item{ position:relative; margin-bottom:36px; }
+  .rm-item:last-child{ margin-bottom:0; }
+  .rm-item::before{
+    content:''; position:absolute; left:-32px; top:4px; width:11px; height:11px; border-radius:50%;
+    background:var(--bg); border:2px solid var(--signal);
+  }
+  .rm-item.future::before{ border-color:var(--robot); }
+  .rm-item .rm-tag{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--signal); text-transform:uppercase; letter-spacing:0.06em; }
+  .rm-item.future .rm-tag{ color:var(--robot); }
+  .rm-item h3{ font-size:19px; margin:6px 0 4px; }
+  .rm-item .rm-meta{ font-size:13px; color:var(--dim); margin-bottom:8px; font-family:'IBM Plex Mono'; }
+  .rm-item p{ color:var(--muted); font-size:14.5px; max-width:640px; }
+
+  /* ---------- Experience ---------- */
+  .exp-item{ border:1px solid var(--line); border-radius:6px; padding:26px 28px; margin-bottom:20px; background:var(--surface); }
+  .exp-top{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .exp-top h3{ font-size:19px; }
+  .exp-top .exp-time{ font-family:'IBM Plex Mono'; font-size:12px; color:var(--signal); white-space:nowrap; }
+  .exp-org{ color:var(--dim); font-size:13.5px; margin-bottom:14px; }
+  .exp-item ul{ list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .exp-item li{ color:var(--muted); font-size:14.5px; padding-left:18px; position:relative; }
+  .exp-item li::before{ content:'▹'; position:absolute; left:0; color:var(--signal); }
+
+  /* ---------- Projects ---------- */
+  .proj-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  @media (max-width:900px){ .proj-grid{ grid-template-columns:1fr; } }
+  .proj-card{
+    border:1px solid var(--line); border-radius:6px; background:var(--surface); padding:26px;
+    display:flex; flex-direction:column; transition:border-color .2s ease, transform .2s ease;
+  }
+  .proj-card:hover{ border-color:var(--signal); transform:translateY(-3px); }
+  .proj-tag{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--robot); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px; }
+  .proj-card h3{ font-size:18px; margin-bottom:12px; line-height:1.3; }
+  .proj-card p{ color:var(--muted); font-size:14px; margin-bottom:18px; flex-grow:1; }
+  .proj-stats{ display:flex; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
+  .proj-stats div{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--dim); }
+  .proj-stats div b{ display:block; color:var(--signal); font-size:16px; }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{ font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--muted); border:1px solid var(--line); padding:4px 9px; border-radius:20px; }
+
+  /* ---------- Skills ---------- */
+  .skill-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+  @media (max-width:800px){ .skill-grid{ grid-template-columns:1fr; } }
+  .skill-card{ border:1px solid var(--line); border-radius:6px; padding:24px; background:var(--surface); }
+  .skill-card h3{ font-size:14px; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .skill-card h3 .sw{ width:8px; height:8px; border-radius:2px; }
+  .skill-card .chip-row .chip:hover{ border-color:var(--signal); color:var(--signal); }
+
+  /* ---------- Certs / Languages ---------- */
+  .cl-grid{ display:grid; grid-template-columns:2fr 1fr; gap:22px; }
+  @media (max-width:800px){ .cl-grid{ grid-template-columns:1fr; } }
+  .cert-list, .lang-list{ border:1px solid var(--line); border-radius:6px; background:var(--surface); }
+  .cert-item, .lang-item{ padding:16px 22px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; font-size:14px; }
+  .cert-item:last-child, .lang-item:last-child{ border-bottom:none; }
+  .lang-bar{ width:90px; height:5px; background:var(--line); border-radius:3px; overflow:hidden; }
+  .lang-bar span{ display:block; height:100%; background:var(--signal); }
+
+  /* ---------- Footer / Contact ---------- */
+  footer{ padding:90px 0 50px; }
+  .contact-box{
+    border:1px solid var(--line); border-radius:8px; padding:52px; text-align:center;
+    background:radial-gradient(ellipse at top, var(--surface-2), var(--surface));
+  }
+  .contact-box h2{ font-size:clamp(26px,4vw,40px); margin-bottom:14px; }
+  .contact-box p{ color:var(--muted); margin-bottom:30px; }
+  .contact-links{ display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
+  .foot-bottom{ margin-top:60px; display:flex; justify-content:space-between; color:var(--dim); font-size:12.5px; font-family:'IBM Plex Mono'; flex-wrap:wrap; gap:10px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span> MD.SHAZIB.SHEIKH</div>
+    <div class="navlinks">
+      <a href="#about">About</a>
+      <a href="#education">Education</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Autonomous Systems Engineer</div>
+      <h1>Robots don't run<br>in <span class="accent">isolation.</span><br>Neither do I.</h1>
+      <p class="lede">M.Sc. candidate in Robotics &amp; Autonomous Systems, moving from a foundation of two years keeping nationwide telecom networks alive — now building perception and decision-making into machines that need to coordinate, not just compute.</p>
+      <div class="hero-meta">
+        <div>Based in <span>Ingolstadt → Lübeck, DE</span></div>
+        <div>Focus <span>Perception · Multi-Robot Systems · Networked Infra</span></div>
+        <div>Languages <span>English B2 · German A1</span></div>
+      </div>
+      <div class="btn-row">
+        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span>SYSTEM_TOPOLOGY.LOG</span>
+        <span class="live">LIVE</span>
+      </div>
+      <svg id="netgraph" viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg">
+        <!-- edges -->
+        <path class="edge" d="M170,40 L70,110" />
+        <path class="edge" d="M170,40 L270,110" />
+        <path class="edge" d="M70,110 L70,200" />
+        <path class="edge" d="M270,110 L270,200" />
+        <path class="edge" d="M70,110 L170,150" />
+        <path class="edge" d="M270,110 L170,150" />
+        <path class="edge" d="M170,150 L70,200" />
+        <path class="edge" d="M170,150 L270,200" />
+        <path class="edge" d="M70,200 L120,255" />
+        <path class="edge" d="M270,200 L220,255" />
+        <path class="edge" d="M120,255 L220,255" />
+
+        <!-- nodes: network (teal) -->
+        <circle class="node-core" cx="170" cy="40" r="12"/>
+        <text class="label-sm" x="170" y="20" text-anchor="middle">NOC</text>
+
+        <circle class="node-core" cx="70" cy="110" r="10"/>
+        <circle class="node-core" cx="270" cy="110" r="10"/>
+        <circle class="node-core" cx="170" cy="150" r="9"/>
+        <text class="label-sm" x="170" y="132" text-anchor="middle">FUSION</text>
+
+        <!-- nodes: robots (orange) -->
+        <circle class="node-robot" cx="70" cy="200" r="11"/>
+        <text class="label-sm" x="70" y="223" text-anchor="middle">ROBOT A</text>
+        <circle class="node-robot" cx="270" cy="200" r="11"/>
+        <text class="label-sm" x="270" y="223" text-anchor="middle">ROBOT B</text>
+
+        <circle class="node-robot" cx="120" cy="255" r="8"/>
+        <circle class="node-robot" cx="220" cy="255" r="8"/>
+        <text class="label-sm" x="170" y="278" text-anchor="middle">TASK QUEUE</text>
+
+        <!-- pulses -->
+        <circle class="pulse" r="3">
+          <animateMotion dur="2.4s" repeatCount="indefinite" path="M170,40 L70,110 L70,200 L120,255"/>
+        </circle>
+        <circle class="pulse o" r="3">
+          <animateMotion dur="2.8s" repeatCount="indefinite" path="M170,40 L270,110 L270,200 L220,255"/>
+        </circle>
+        <circle class="pulse" r="2.6">
+          <animateMotion dur="2s" repeatCount="indefinite" path="M170,150 L270,110"/>
+        </circle>
+        <circle class="pulse o" r="2.6">
+          <animateMotion dur="2.2s" repeatCount="indefinite" path="M170,150 L70,200"/>
+        </circle>
+      </svg>
+      <div class="stat-row">
+        <div>Uptime maintained<b>95%+ SLA</b></div>
+        <div>Incidents resolved<b>50+ / yr</b></div>
+        <div>Detection accuracy<b>~95%</b></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-head"><span class="idx">/ 01</span><h2>About</h2></div>
+    <div class="about-grid">
+      <div>
+        <p>I spent two years as an engineer at <strong>Fiber@Home Limited</strong>, watching over nationwide telecom and IP infrastructure — resolving <strong>100+ weekly tickets</strong>, isolating faults across DWDM, MPLS, and GPON, and keeping distributed systems reliable under real pressure. That work taught me something most robotics engineers never have to learn early: <span class="signal-word">systems fail at the connections, not just the components.</span></p>
+        <p>Now I'm applying that instinct to <span class="robot-word">autonomous systems</span> — most recently building a vision-guided dual-robot sorting system where a Braccio arm and a DJI RoboMaster had to perceive, decide, and hand off tasks to each other in real time. It's the same problem I used to monitor from a NOC dashboard, just embodied in hardware.</p>
+        <p>I'm currently completing an M.Sc. in AI Engineering of Autonomous Systems at THI, and transitioning this winter to <strong>Robotics and Autonomous Systems at the University of Lübeck</strong> — trading a software-first curriculum for one grounded in mechanics, electrical engineering, and medical/service robotics research.</p>
+      </div>
+      <div class="fact-list">
+        <div class="fact"><span class="k">CURRENT_FOCUS</span><span class="v">Perception + Multi-Robot Coordination</span></div>
+        <div class="fact"><span class="k">BACKGROUND</span><span class="v">Telecom / Network Operations</span></div>
+        <div class="fact"><span class="k">DEGREE_PATH</span><span class="v">THI → Uni Lübeck, Winter 2026/27</span></div>
+        <div class="fact"><span class="k">CORE_LANGS</span><span class="v">Python · C++ · Java</span></div>
+        <div class="fact"><span class="k">LOCATION</span><span class="v">Germany</span></div>
+        <div class="fact"><span class="k">OPEN_TO</span><span class="v">Working Student / Internship Roles</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="education">
+  <div class="wrap">
+    <div class="section-head"><span class="idx">/ 02</span><h2>Education</h2></div>
+    <p class="section-sub">A deliberate shift — from software-first autonomous systems to a broader, hardware-grounded robotics foundation.</p>
+    <div class="roadmap">
+      <div class="rm-item">
+        <div class="rm-tag">Completed</div>
+        <h3>B.Sc. Computer Science &amp; Engineering</h3>
+        <div class="rm-meta">American International University-Bangladesh · 01/2018 – 05/2022</div>
+        <p>Thesis: Regulatory Requirements Compliance of Software Development in Bangladesh, supervised by Dr. Mohammad Mahmudul Hasan, Dept. of CSE, AIUB.</p>
+      </div>
+      <div class="rm-item">
+        <div class="rm-tag">In Progress</div>
+        <h3>M.Sc. AI Engineering of Autonomous Systems</h3>
+        <div class="rm-meta">Technische Hochschule Ingolstadt · 03/2024 – Present</div>
+        <p>Focus areas: Computing &amp; Connectivity Technologies, Automotive Communication Systems — a software-engineering approach to autonomous system design.</p>
+      </div>
+      <div class="rm-item future">
+        <div class="rm-tag">Incoming — Winter 2026/27</div>
+        <h3>M.Sc. Robotics and Autonomous Systems</h3>
+        <div class="rm-meta">University of Lübeck</div>
+        <p>An interdisciplinary program spanning physics, mechanical &amp; electrical engineering, and AI — with research strength in medical, service, and multi-robot systems.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <div class="section-head"><span class="idx">/ 03</span><h2>Experience</h2></div>
+    <div class="exp-item">
+      <div class="exp-top">
+        <h3>Engineer, Network Operations</h3>
+        <span class="exp-time mono">07/2022 – 06/2024</span>
+      </div>
+      <div class="exp-org">Fiber@Home Limited</div>
+      <ul>
+        <li>Monitored nationwide telecom and IP networks 24/7 using Nokia, Huawei, and Nagios dashboards to ensure high availability and service reliability.</li>
+        <li>Performed real-time alarm analysis, fault isolation, and first-level troubleshooting across DWDM, MPLS, GPON, and Layer 2/3 infrastructure, including Linux server checks via SSH.</li>
+        <li>Resolved 100+ weekly trouble tickets while maintaining over 95% SLA compliance; supported major incident recovery through rapid coordination and root cause analysis.</li>
+        <li>Led resolution of 50+ major network incidents annually, cutting average downtime by 30% through cross-functional coordination.</li>
+      </ul>
+    </div>
+    <div class="exp-item">
+      <div class="exp-top">
+        <h3>Intern, Network Infrastructure</h3>
+        <span class="exp-time mono">01/2022 – 04/2022</span>
+      </div>
+      <div class="exp-org">InfoLink Limited</div>
+      <ul>
+        <li>Deployed and configured 4+ MikroTik routers and switches across branch offices, improving routing efficiency by optimizing OSPF and BGP protocols.</li>
+        <li>Assisted network infrastructure upgrades — hardware installation, VLAN setup, and firewall policies — ensuring reliable connectivity.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <div class="section-head"><span class="idx">/ 04</span><h2>Featured Projects</h2></div>
+    <p class="section-sub">Perception, decision-making, and networked systems — the three legs of autonomous engineering.</p>
+    <div class="proj-grid">
+
+      <div class="proj-card">
+        <div class="proj-tag">Multi-Robot · Vision</div>
+        <h3>Autonomous Object Sorting &amp; Transport — Dual-Robot Collaboration</h3>
+        <p>A Braccio robotic arm and a DJI RoboMaster working in parallel to detect, sort, and transport objects — the arm handling perception and sorting, the RoboMaster handling movement and delivery. I built the HSV color-detection module enabling the Braccio to identify and sort objects reliably under varied lighting, using DepthAI and OpenCV for real-time detection.</p>
+        <div class="proj-stats">
+          <div>Red accuracy<b>~95%</b></div>
+          <div>Green accuracy<b>~90%</b></div>
+        </div>
+        <div class="chip-row">
+          <span class="chip">OpenCV</span><span class="chip">DepthAI</span><span class="chip">HSV Detection</span><span class="chip">Multi-Robot</span>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-tag">Reinforcement Learning</div>
+        <h3>Agent Adventure — Q-Learning Navigation</h3>
+        <p>Designed a custom Gymnasium environment simulating autonomous navigation with dynamic rewards, obstacles, and danger zones. Trained a Q-learning agent using adaptive exploration and reward shaping, then evaluated policy behavior through Q-table heatmap visualizations.</p>
+        <div class="proj-stats">
+          <div>Environment<b>Custom Gym</b></div>
+          <div>Method<b>Q-Learning</b></div>
+        </div>
+        <div class="chip-row">
+          <span class="chip">Python</span><span class="chip">Gymnasium</span><span class="chip">Reward Shaping</span>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-tag">Network Infrastructure</div>
+        <h3>MPLS Network System for AIUB</h3>
+        <p>Designed and implemented an MPLS-based campus network across 8 routers using GNS3 and Cisco Packet Tracer, simulating a multi-site environment. Configured routing and traffic engineering to reduce congestion, then validated performance via latency, throughput, and packet-loss testing.</p>
+        <div class="proj-stats">
+          <div>Routers<b>8</b></div>
+          <div>Scope<b>Multi-site</b></div>
+        </div>
+        <div class="chip-row">
+          <span class="chip">GNS3</span><span class="chip">MPLS</span><span class="chip">Packet Tracer</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="section-head"><span class="idx">/ 05</span><h2>Skills</h2></div>
+    <div class="skill-grid">
+      <div class="skill-card">
+        <h3><span class="sw" style="background:var(--robot)"></span>AI &amp; Robotics</h3>
+        <div class="chip-row">
+          <span class="chip">Python</span><span class="chip">OpenCV</span><span class="chip">DepthAI</span>
+          <span class="chip">Gymnasium</span><span class="chip">Q-Learning</span><span class="chip">Arduino</span><span class="chip">Raspberry Pi</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3><span class="sw" style="background:var(--signal)"></span>Networking &amp; Systems</h3>
+        <div class="chip-row">
+          <span class="chip">OSI / TCP-IP</span><span class="chip">MPLS</span><span class="chip">VLAN</span><span class="chip">WAN</span>
+          <span class="chip">DWDM</span><span class="chip">GPON</span><span class="chip">OSPF / BGP</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3><span class="sw" style="background:var(--robot)"></span>Programming &amp; Databases</h3>
+        <div class="chip-row">
+          <span class="chip">Python</span><span class="chip">Java</span><span class="chip">C++</span>
+          <span class="chip">Oracle</span><span class="chip">MySQL</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3><span class="sw" style="background:var(--signal)"></span>Tools &amp; Platforms</h3>
+        <div class="chip-row">
+          <span class="chip">Linux / Ubuntu</span><span class="chip">Security Onion</span><span class="chip">Xshell</span>
+          <span class="chip">PuTTY</span><span class="chip">Cisco Packet Tracer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="certs">
+  <div class="wrap">
+    <div class="section-head"><span class="idx">/ 06</span><h2>Certifications &amp; Languages</h2></div>
+    <div class="cl-grid">
+      <div class="cert-list">
+        <div class="cert-item"><span>Programming Essentials in Python</span><span class="mono" style="color:var(--dim); font-size:12px;">CERT</span></div>
+        <div class="cert-item"><span>CyberOps Associate</span><span class="mono" style="color:var(--dim); font-size:12px;">CISCO</span></div>
+        <div class="cert-item"><span>Cybersecurity Essentials</span><span class="mono" style="color:var(--dim); font-size:12px;">CISCO</span></div>
+      </div>
+      <div class="lang-list">
+        <div class="lang-item"><span>English</span><div class="lang-bar"><span style="width:70%"></span></div></div>
+        <div class="lang-item"><span>German</span><div class="lang-bar"><span style="width:25%"></span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="contact-box">
+      <h2>Let's build something<br>that stays connected.</h2>
+      <p>Open to working student and internship roles in robotics, autonomous systems, and network automation across Germany.</p>
+      <div class="contact-links">
+        <a class="btn btn-primary" href="mailto:md.shazib111@live.com">md.shazib111@live.com</a>
+        <a class="btn btn-ghost" href="tel:+491786314301">+49 178 6314301</a>
+        <a class="btn btn-ghost" href="https://www.linkedin.com/in/md-shazib111/" target="_blank" rel="noopener">LinkedIn ↗</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>MD. SHAZIB SHEIKH — INGOLSTADT / LÜBECK, DE</span>
+      <span>© 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
